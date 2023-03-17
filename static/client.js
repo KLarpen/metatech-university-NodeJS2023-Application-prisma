@@ -1,11 +1,10 @@
 'use strict';
 
-const scaffold = (url, structure) => {
+const scaffold = async (url, structure) => {
   const api = {};
   const parsedURL = new URL(url);
   const protocol = parsedURL.protocol.slice(0, parsedURL.protocol.length - 1);
   const services = Object.keys(structure);
-  console.log({ protocol });
 
   const http =
     (serviceName, method) =>
@@ -76,76 +75,82 @@ const scaffold = (url, structure) => {
   if (protocol === 'ws') {
     const socket = new WebSocket(url);
     fillApi(protocol, socket);
+    await new Promise((resolve) => {
+      socket.addEventListener('open', resolve);
+    });
   } else fillApi(protocol, null);
 
   return api;
 };
 
-const api = scaffold('ws://127.0.0.1:8001', {
-  auth: {
-    signin: ['login', 'password'],
-    signout: [],
-    restore: ['token'],
-  },
-  messenger: {
-    createArea: ['name', 'memberIdList'],
-    updateAreaName: ['areaId', 'name'],
-    updateAreaMembers: ['areaId', 'memberIdList'],
-    transferAreaOwnership: ['areaId', 'ownerId'],
-    readArea: ['areaId'],
-    readMessages: ['areaId'],
-    sendMessage: ['areaId', 'text'],
-  },
-  parking: {
-    createParking: ['name', 'address', 'location'],
-    addParkingChargers: ['parkingId', 'electricChargerIdList'],
-    removeParkingChargers: ['parkingId', 'electricChargerIdList'],
-    addSpot: [
-      'parkingId',
-      'floor',
-      'place',
-      'cost',
-      'suitableFor',
-      'electricChargerIdList',
-      'chargingPortIdList',
-    ],
-    updateSpot: [
-      'spotId',
-      'available',
-      'cost',
-      'suitableFor',
-      'electricChargerIdList',
-      'chargingPortIdList',
-    ],
-    deleteSpot: ['spotId'],
-    createElectricCharger: ['model', 'ports', 'parkingId'],
-    updateChargingPort: ['chargingPortId', 'available', 'cost', 'power'],
-    createPortType: ['socket', 'current'],
-    getKnownPortTypes: [],
-    getAvailableSpot: ['parkingId'],
-    rentSpot: ['spotId', 'chargingPortId'],
-    finishRent: ['rentId', 'billingSettingsId'],
-  },
-  client: {
-    initClient: [
-      'firstName',
-      'lastName',
-      'phones',
-      'vehicleId',
-      'billingSettingsProto',
-    ],
-    getKnownVehicles: [],
-    createVehicle: ['model', 'kind', 'portTypeId'],
-    addBillingSettings: ['cardNo', 'main'],
-    selectMainBilling: ['billingSettingsId'],
-    deleteBillingSettings: ['billingSettingsId'],
-  },
-});
-
-// Example of usage
 (async () => {
+  const api = await scaffold('ws://127.0.0.1:8001', {
+    auth: {
+      signin: ['login', 'password'],
+      signout: [],
+      restore: ['token'],
+    },
+    messenger: {
+      createArea: ['name', 'memberIdList'],
+      updateAreaName: ['areaId', 'name'],
+      updateAreaMembers: ['areaId', 'memberIdList'],
+      transferAreaOwnership: ['areaId', 'ownerId'],
+      readArea: ['areaId'],
+      readMessages: ['areaId'],
+      sendMessage: ['areaId', 'text'],
+    },
+    parking: {
+      createParking: ['name', 'address', 'location'],
+      addParkingChargers: ['parkingId', 'electricChargerIdList'],
+      removeParkingChargers: ['parkingId', 'electricChargerIdList'],
+      addSpot: [
+        'parkingId',
+        'floor',
+        'place',
+        'cost',
+        'suitableFor',
+        'electricChargerIdList',
+        'chargingPortIdList',
+      ],
+      updateSpot: [
+        'spotId',
+        'available',
+        'cost',
+        'suitableFor',
+        'electricChargerIdList',
+        'chargingPortIdList',
+      ],
+      deleteSpot: ['spotId'],
+      createElectricCharger: ['model', 'ports', 'parkingId'],
+      updateChargingPort: ['chargingPortId', 'available', 'cost', 'power'],
+      createPortType: ['socket', 'current'],
+      getKnownPortTypes: [],
+      getAvailableSpot: ['parkingId'],
+      rentSpot: ['spotId', 'chargingPortId'],
+      finishRent: ['rentId', 'billingSettingsId'],
+    },
+    client: {
+      initClient: [
+        'firstName',
+        'lastName',
+        'phones',
+        'vehicleId',
+        'billingSettingsProto',
+      ],
+      getKnownVehicles: [],
+      createVehicle: ['model', 'kind', 'portTypeId'],
+      addBillingSettings: ['cardNo', 'main'],
+      selectMainBilling: ['billingSettingsId'],
+      deleteBillingSettings: ['billingSettingsId'],
+    },
+  });
+
+  // Global link to use api in console
+  window.api = api;
+
+  // Example of usage
   let spot, port;
-  const data = await api.auth.signin('user', 'nopassword');
+  const data = await api.auth.signin({ login: 'user', password: 'nopassword' });
   console.dir({ data });
   // Just get common catalogs for usage
   const portTypes = await api.parking.getKnownPortTypes();
