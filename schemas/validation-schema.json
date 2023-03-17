@@ -1,0 +1,757 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Role": {
+      "type": "object",
+      "properties": {
+        "roleId": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Account"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ]
+    },
+    "Account": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "integer"
+        },
+        "login": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "password": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Role"
+          }
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Session"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ownAreas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Area"
+          }
+        },
+        "areas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Area"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Message"
+          }
+        },
+        "client": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Client"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "login",
+        "password"
+      ]
+    },
+    "Session": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "integer"
+        },
+        "account": {
+          "$ref": "#/definitions/Account"
+        },
+        "accountId": {
+          "type": "integer"
+        },
+        "token": {
+          "type": "string"
+        },
+        "ip": {
+          "type": "string",
+          "format": "ipv4"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "accountId",
+        "token",
+        "ip",
+        "data"
+      ]
+    },
+    "Area": {
+      "type": "object",
+      "properties": {
+        "areaId": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "owner": {
+          "$ref": "#/definitions/Account"
+        },
+        "ownerId": {
+          "type": "integer"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Account"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Message"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "ownerId"
+      ]
+    },
+    "Message": {
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string"
+        },
+        "from": {
+          "$ref": "#/definitions/Account"
+        },
+        "fromId": {
+          "type": "integer"
+        },
+        "area": {
+          "$ref": "#/definitions/Area"
+        },
+        "areaId": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "fromId",
+        "areaId"
+      ]
+    },
+    "Location": {
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      },
+      "additionalProperties": false,
+      "required": [ "latitude", "longitude" ]
+    },
+    "Address": {
+      "type": "object",
+      "properties": {
+        "country": { "type": "string" },
+        "state": { "type": "string" },
+        "city": { "type": "string" },
+        "streetAddress": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "required": ["country", "city", "streetAddress"]
+    },
+    "Parking": {
+      "type": "object",
+      "properties": {
+        "parkingId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/Address"
+        },
+        "location": {
+          "$ref": "#/definitions/Location"
+        },
+        "spots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Spot"
+          }
+        },
+        "chargers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ElectricCharger"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "address",
+        "location"
+      ]
+    },
+    "Spot": {
+      "type": "object",
+      "properties": {
+        "spotId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "parkingId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "parking": {
+          "$ref": "#/definitions/Parking"
+        },
+        "floor": {
+          "type": "integer"
+        },
+        "place": {
+          "type": "integer"
+        },
+        "cost": {
+          "type": "number"
+        },
+        "available": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": true
+        },
+        "suitableFor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VehicleKind"
+          },
+          "minItems": 1
+        },
+        "chargers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ElectricCharger"
+          }
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChargingPort"
+          }
+        },
+        "rents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Rent"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "parkingId",
+        "floor",
+        "place",
+        "cost",
+        "suitableFor"
+      ]
+    },
+    "VehicleKind": {
+      "description": "A kind of an electric vehicle",
+      "type": "string",
+      "enum": [
+        "BICYCLE",
+        "SCOOTER",
+        "MOTORCYCLE",
+        "CAR",
+        "VAN",
+        "TRUCK",
+        "BUS"
+      ]
+    },
+    "ElectricCharger": {
+      "type": "object",
+      "properties": {
+        "electricChargerId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "model": {
+          "type": "string"
+        },
+        "parkingId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "parking": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Parking"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "spots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Spot"
+          }
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChargingPort"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "model"
+      ]
+    },
+    "PortType": {
+      "type": "object",
+      "properties": {
+        "portTypeId": {
+          "type": "integer"
+        },
+        "socket": {
+          "type": "string"
+        },
+        "current": {
+          "type": "string",
+          "enum": [
+            "AC",
+            "DC"
+          ]
+        },
+        "stationPorts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChargingPort"
+          }
+        },
+        "vehicles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Vehicle"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "socket",
+        "current"
+      ]
+    },
+    "ChargingPort": {
+      "type": "object",
+      "properties": {
+        "chargingPortId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "portTypeId": {
+          "type": "integer"
+        },
+        "type": {
+          "$ref": "#/definitions/PortType"
+        },
+        "available": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": true
+        },
+        "cost": {
+          "type": "number"
+        },
+        "power": {
+          "type": "number"
+        },
+        "electricChargerId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "station": {
+          "$ref": "#/definitions/ElectricCharger"
+        },
+        "spots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Spot"
+          }
+        },
+        "rents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Rent"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "portTypeId",
+        "cost",
+        "power",
+        "electricChargerId"
+      ]
+    },
+    "Vehicle": {
+      "type": "object",
+      "properties": {
+        "vehicleId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "model": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/definitions/VehicleKind"
+        },
+        "portTypeId": {
+          "type": "integer"
+        },
+        "portType": {
+          "$ref": "#/definitions/PortType"
+        },
+        "modelIsUsedBy": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Client"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "kind",
+        "portTypeId"
+      ]
+    },
+    "Phones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["type", "value"]
+      },
+      "minItems": 1
+    },
+    "Client": {
+      "type": "object",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "accountId": {
+          "type": "integer"
+        },
+        "account": {
+          "$ref": "#/definitions/Account"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "phones": {
+          "$ref": "#/definitions/Phones"
+        },
+        "vehicleId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "vehicle": {
+          "$ref": "#/definitions/Vehicle"
+        },
+        "billingSettings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BillingSettings"
+          },
+          "minItems": 1
+        },
+        "rents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Rent"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "accountId",
+        "firstName",
+        "lastName",
+        "phones",
+        "vehicleId"
+      ]
+    },
+    "BillingSettings": {
+      "type": "object",
+      "properties": {
+        "billingSettingsId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "clientId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "client": {
+          "$ref": "#/definitions/Client"
+        },
+        "cardNo": {
+          "type": "string",
+          "pattern": "^([0-9]{4})-([0-9]{4})-([0-9]{4})-([0-9]{4})$"
+        },
+        "main": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": false
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Payment"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "clientId",
+        "cardNo"
+      ]
+    },
+    "Rent": {
+      "type": "object",
+      "properties": {
+        "rentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "spotId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "chargingPortId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "clientId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "started": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finished": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "freezedCostRates": {
+          "type": "object",
+          "properties": {
+            "spot": { "type": "number" },
+            "port": { "type": "number" }
+          },
+          "required": ["spot", "port"],
+          "additionalProperties": false
+        },
+        "totalPrice": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "spot": {
+          "$ref": "#/definitions/Spot"
+        },
+        "chargingPort": {
+          "$ref": "#/definitions/ChargingPort"
+        },
+        "client": {
+          "$ref": "#/definitions/Client"
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Payment"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "spotId",
+        "chargingPortId",
+        "clientId",
+        "started",
+        "freezedCostRates"
+      ]
+    },
+    "Payment": {
+      "type": "object",
+      "properties": {
+        "paymentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "rentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "billingSettingsId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "when": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rent": {
+          "$ref": "#/definitions/Rent"
+        },
+        "payerRequisites": {
+          "$ref": "#/definitions/BillingSettings"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "rentId",
+        "billingSettingsId",
+        "amount",
+        "when"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "role": {
+      "$ref": "#/definitions/Role"
+    },
+    "account": {
+      "$ref": "#/definitions/Account"
+    },
+    "session": {
+      "$ref": "#/definitions/Session"
+    },
+    "area": {
+      "$ref": "#/definitions/Area"
+    },
+    "message": {
+      "$ref": "#/definitions/Message"
+    },
+    "parking": {
+      "$ref": "#/definitions/Parking"
+    },
+    "spot": {
+      "$ref": "#/definitions/Spot"
+    },
+    "electricCharger": {
+      "$ref": "#/definitions/ElectricCharger"
+    },
+    "portType": {
+      "$ref": "#/definitions/PortType"
+    },
+    "chargingPort": {
+      "$ref": "#/definitions/ChargingPort"
+    },
+    "vehicle": {
+      "$ref": "#/definitions/Vehicle"
+    },
+    "client": {
+      "$ref": "#/definitions/Client"
+    },
+    "billingSettings": {
+      "$ref": "#/definitions/BillingSettings"
+    },
+    "rent": {
+      "$ref": "#/definitions/Rent"
+    },
+    "payment": {
+      "$ref": "#/definitions/Payment"
+    }
+  }
+}
