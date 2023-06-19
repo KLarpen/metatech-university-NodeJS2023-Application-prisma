@@ -19,9 +19,7 @@ declare namespace api.client {
     cardNo: string;
     main?: boolean;
   }): Promise<{ status: string }>;
-  function selectMainBilling(
-    billingSettingsId,
-  ): Promise<{ status: string }>;
+  function selectMainBilling(billingSettingsId): Promise<{ status: string }>;
   function deleteBillingSettings(
     billingSettingsId,
   ): Promise<{ status: string }>;
