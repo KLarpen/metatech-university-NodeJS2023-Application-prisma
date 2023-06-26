@@ -1,5 +1,7 @@
 'use strict';
 
+let callId = 1;
+
 const scaffold = async (url, structure) => {
   const api = {};
   const parsedURL = new URL(url);
@@ -7,11 +9,17 @@ const scaffold = async (url, structure) => {
   const services = Object.keys(structure);
 
   const http =
-    (serviceName, method) =>
-    (...args) =>
+    (serviceName, methodName) =>
+    (args = {}) =>
       new Promise((resolve, reject) => {
-        const body = JSON.stringify({ args });
-        fetch(`${url}/api/${serviceName}/${method}`, {
+        const packet = {
+          type: 'call',
+          id: callId++,
+          method: `${serviceName}/${methodName}`,
+          args,
+        };
+        const body = JSON.stringify(packet);
+        fetch(`${url}/api`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
@@ -20,7 +28,7 @@ const scaffold = async (url, structure) => {
           body,
         })
           .then((res) => {
-            if (res.ok && res.status === 200) resolve(res.json());
+            if (res.ok && res.status === 200) return res.json();
             else
               reject(
                 new Error(
@@ -28,18 +36,26 @@ const scaffold = async (url, structure) => {
                 ),
               );
           })
+          .then((data) => {
+            resolve(data?.result ?? data?.error);
+          })
           .catch(reject);
       });
 
   const ws =
-    (serviceName, method, ws) =>
-    (...args) =>
+    (serviceName, methodName, ws) =>
+    (args = {}) =>
       new Promise((resolve) => {
-        const packet = { name: serviceName, method, args };
+        const packet = {
+          type: 'call',
+          id: callId++,
+          method: `${serviceName}/${methodName}`,
+          args,
+        };
         ws.send(JSON.stringify(packet));
         ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
-          resolve(data);
+          resolve(data?.result ?? data?.error ?? data);
         };
       });
 
@@ -153,9 +169,9 @@ const scaffold = async (url, structure) => {
   const data = await api.auth.signin({ login: 'user', password: 'nopassword' });
   console.dir({ data });
   // Just get common catalogs for usage
-  const portTypes = await api.parking.getKnownPortTypes();
-  const vehicleModels = await api.client.getKnownVehicles();
-  console.dir({ portTypes, vehicleModels });
+  const { portTypes } = await api.parking.getKnownPortTypes();
+  const { vehicles } = await api.client.getKnownVehicles();
+  console.dir({ portTypes, vehicles });
   // Search for parking spot
   // parkingId in getAvailableSpot() is an optional argument so omitted there
   const searchForSpot = await api.parking.getAvailableSpot();
@@ -170,7 +186,10 @@ const scaffold = async (url, structure) => {
   }
   // Rent
   if (spot && port) {
-    const renting = api.parking.rentSpot(spot.spotId, port.chargingPortId);
+    const renting = api.parking.rentSpot({
+      spotId: spot.spotId,
+      chargingPortId: port.chargingPortId,
+    });
     console.dir({ renting });
   } else {
     console.log('There is no available EV parking spots with chargers');
