@@ -12,14 +12,14 @@ declare namespace api.parking {
       longitude: number;
     };
   }): Promise<{ status: string; parking: object }>;
-  function addParkingChargers(
-    parkingId: string,
-    electricChargerIdList: string[],
-  ): Promise<{ status: string }>;
-  function removeParkingChargers(
-    parkingId: string,
-    electricChargerIdList: string[],
-  ): Promise<{ status: string }>;
+  function addParkingChargers(record: {
+    parkingId: string;
+    electricChargerIdList: string[];
+  }): Promise<{ status: string }>;
+  function removeParkingChargers(args: {
+    parkingId: string;
+    electricChargerIdList: string[];
+  }): Promise<{ status: string }>;
   function addSpot(record: {
     parkingId: string;
     floor: number;
@@ -29,30 +29,26 @@ declare namespace api.parking {
     electricChargerIdList: string[];
     chargingPortIdList: string[];
   }): Promise<{ status: string; spot: object }>;
-  function updateSpot(
-    spotId: string,
-    record: {
-      available?: boolean;
-      cost?: number;
-      suitableFor?: string[];
-      electricChargerIdList?: string[];
-      chargingPortIdList?: string[];
-    },
-  ): Promise<{ status: string }>;
-  function deleteSpot(spotId: string): Promise<{ status: string }>;
+  function updateSpot(args: {
+    spotId: string;
+    available?: boolean;
+    cost?: number;
+    suitableFor?: string[];
+    electricChargerIdList?: string[];
+    chargingPortIdList?: string[];
+  }): Promise<{ status: string }>;
+  function deleteSpot(args: { spotId: string }): Promise<{ status: string }>;
   function createElectricCharger(record: {
     model: string;
     ports: Array<object>;
     parkingId?: string;
   }): Promise<{ status: string; electricCharger: object }>;
-  function updateChargingPort(
-    chargingPortId: string,
-    record: {
-      available?: boolean;
-      cost?: number;
-      power?: number;
-    },
-  ): Promise<{ status: string }>;
+  function updateChargingPort(args: {
+    chargingPortId: string;
+    available?: boolean;
+    cost?: number;
+    power?: number;
+  }): Promise<{ status: string }>;
   function createPortType(record: {
     socket: string;
     current: 'AC' | 'DC';
@@ -61,15 +57,15 @@ declare namespace api.parking {
     status: string;
     portTypes: object[];
   }>;
-  function getAvailableSpot(
-    parkingId?: string,
-  ): Promise<{ status: string; parkings: object[] }>;
-  function rentSpot(
-    spotId: string,
-    chargingPortId: string,
-  ): Promise<{ status: string }>;
-  function finishRent(
-    rentId: string,
-    billingSettingsId?: string,
-  ): Promise<{ status: string; totalPrice: number }>;
+  function getAvailableSpot(args: {
+    parkingId?: string;
+  }): Promise<{ status: string; parkings: object[] }>;
+  function rentSpot(args: {
+    spotId: string;
+    chargingPortId: string;
+  }): Promise<{ status: string }>;
+  function finishRent(args: {
+    rentId: string;
+    billingSettingsId?: string;
+  }): Promise<{ status: string; totalPrice: number }>;
 }

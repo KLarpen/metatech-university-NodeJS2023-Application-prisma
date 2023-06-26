@@ -1,4 +1,6 @@
-async () => {
-  console.log({ method: 'client.getKnownVehicles' });
-  return { status: 'ok', vehicles: [] };
-};
+({
+  method: async () => {
+    console.log({ method: 'client.getKnownVehicles' });
+    return { status: 'ok', vehicles: [] };
+  },
+});

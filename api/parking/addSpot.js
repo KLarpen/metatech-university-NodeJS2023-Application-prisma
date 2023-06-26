@@ -1,14 +1,5 @@
-async ({
-  parkingId,
-  floor,
-  place,
-  cost,
-  suitableFor,
-  electricChargerIdList,
-  chargingPortIdList,
-}) => {
-  console.log({
-    method: 'parking.addSpot',
+({
+  method: async ({
     parkingId,
     floor,
     place,
@@ -16,6 +7,17 @@ async ({
     suitableFor,
     electricChargerIdList,
     chargingPortIdList,
-  });
-  return { status: 'ok', spot: {} };
-};
+  }) => {
+    console.log({
+      method: 'parking.addSpot',
+      parkingId,
+      floor,
+      place,
+      cost,
+      suitableFor,
+      electricChargerIdList,
+      chargingPortIdList,
+    });
+    return { status: 'ok', spot: {} };
+  },
+});

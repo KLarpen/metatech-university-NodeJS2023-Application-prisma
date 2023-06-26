@@ -1,8 +1,10 @@
-async (parkingId, electricChargerIdList) => {
-  console.log({
-    method: 'parking.removeParkingChargers',
-    parkingId,
-    electricChargerIdList,
-  });
-  return { status: 'ok' };
-};
+({
+  method: async ({ parkingId, electricChargerIdList }) => {
+    console.log({
+      method: 'parking.removeParkingChargers',
+      parkingId,
+      electricChargerIdList,
+    });
+    return { status: 'ok' };
+  },
+});

@@ -1,4 +1,6 @@
-async (billingSettingsId) => {
-  console.log({ method: 'client.deleteBillingSettings', billingSettingsId });
-  return { status: 'ok' };
-};
+({
+  method: async ({ billingSettingsId }) => {
+    console.log({ method: 'client.deleteBillingSettings', billingSettingsId });
+    return { status: 'ok' };
+  },
+});

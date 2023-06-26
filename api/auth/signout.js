@@ -1,4 +1,6 @@
-async () => {
-  console.log({ method: 'auth.signout' });
-  return { status: 'ok' };
-};
+({
+  method: async () => {
+    console.log({ method: 'auth.signout' });
+    return { status: 'ok' };
+  },
+});
