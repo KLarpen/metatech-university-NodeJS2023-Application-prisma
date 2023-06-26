@@ -4,7 +4,11 @@
   },
   "globals": {
     "common": "readonly",
-    "application": "readonly"
+    "application": "readonly",
+    "config": "readonly",
+    "db": "readonly",
+    "lib": "readonly",
+    "domain": "readonly"
   },
   "rules": {
     "strict": [

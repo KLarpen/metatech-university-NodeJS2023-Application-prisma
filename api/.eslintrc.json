@@ -3,23 +3,28 @@
     "sourceType": "module"
   },
   "globals": {
-    "api": "readonly",
-    "db": "readonly",
     "common": "readonly",
-    "domain": "readonly",
-    "lib": "readonly",
+    "application": "readonly",
     "config": "readonly",
-    "context": "readonly",
-    "metarhia": "readonly"
+    "db": "readonly",
+    "lib": "readonly",
+    "domain": "readonly",
+    "api": "readonly",
+    "context": "readonly"
   },
   "rules": {
     "strict": ["error", "never"],
     "id-denylist": [
       2,
-      "api",
-      "db",
       "common",
-      "console"
+      "console",
+      "application",
+      "config",
+      "db",
+      "lib",
+      "domain",
+      "api",
+      "context"
     ]
   }
 }
